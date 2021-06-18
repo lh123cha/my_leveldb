@@ -31,6 +31,114 @@ static void DumpInternalIter(Iterator* iter) {
 
 namespace {
 
+//ColumnFamilyIterator
+class ColumnFamilyIterator : public Iterator{
+ public:
+  ColumnFamilyIterator(Iterator* iter,ColumnFamilyHandler& cfh)
+      :iter_(iter),cfh(cfh),valid_(false){}
+  ColumnFamilyIterator(const ColumnFamilyIterator&) = delete;
+  ColumnFamilyIterator& operator=(const ColumnFamilyIterator&) = delete;
+
+  ~ColumnFamilyIterator() override { delete iter_; }
+  bool Valid() const override { return valid_; }
+  Slice key() const override {
+    return  Slice(iter_->key().data()+cfh.GetPerixSize(),iter_->key().size()-cfh.GetPerixSize());
+  }
+  Slice value() const override {
+    return iter_->value();
+  }
+  Status status() const override {
+    return Status::OK();
+  }
+  void Seek(const Slice& target) override{
+    iter_->Seek(cfh.GetPerix()+target.ToString());
+    isValid();
+  }
+  void SeekToFirst() override{
+    iter_->Seek(cfh.GetPerix());
+    isValid();
+  }
+  void SeekToLast()override{
+    iter_->SeekToLast();
+    isValid();
+  }
+  void Next() override{
+    iter_->Next();
+    isValid();
+  }
+  void Prev() override{
+    iter_->Prev();
+    isValid();
+  }
+
+ private:
+  Iterator* const iter_;
+  bool valid_;
+  ColumnFamilyHandler& cfh;//该column的指定指定column
+
+  inline void isValid(){
+    //judge whether the seek key is the valid column
+    valid_=iter_->Valid();
+    if(valid_&&iter_->key().ToString().substr(0,cfh.GetPerixSize()).compare(cfh.GetPerix())!=0){
+      valid_= false;
+    }
+  }
+};
+//IndexIterator
+class IndexIterator :public Iterator{
+ public:
+  ColumnFamilyHandler cfh=ColumnFamilyHandler("Index");
+  IndexIterator(Iterator* iter):iter_(iter),valid_(false),cfh_(cfh){}
+  ~IndexIterator(){delete iter_;}
+
+  bool Valid() const override {return valid_;}
+  Slice key() const override {
+    return  Slice(iter_->key().data(),iter_->key().size());
+  }
+  Slice value() const override {
+    return iter_->value();
+  }
+  Status status() const override {
+    return Status::OK();
+  }
+  void Seek(const Slice& target) override{
+    char prefix_index[9]="00000000";
+    for(int i=0;i<target.size();i++){
+      prefix_index[7-i]=target[target.size()-1-i];
+    }
+    iter_->Seek(cfh.GetPerix()+prefix_index);
+    isValid();
+  }
+  void SeekToFirst() override{
+    iter_->Seek(cfh.GetPerix());
+    isValid();
+  }
+  void SeekToLast()override{
+    iter_->SeekToLast();
+    isValid();
+  }
+  void Next() override{
+    iter_->Next();
+    isValid();
+  }
+  void Prev() override{
+    iter_->Prev();
+    isValid();
+  }
+
+ private:
+  Iterator* iter_;
+  bool valid_;
+  ColumnFamilyHandler& cfh_;
+  void inline isValid(){
+    valid_=iter_->Valid();
+    if(valid_&&iter_->key().ToString().substr(0,cfh.GetPerixSize()).compare(cfh.GetPerix())!=0){
+      valid_= false;
+    }
+  }
+
+};
+
 // Memtables and sstables that make the DB representation contain
 // (userkey,seq,type) => uservalue entries.  DBIter
 // combines multiple entries for the same userkey found in the DB
@@ -315,4 +423,11 @@ Iterator* NewDBIterator(DBImpl* db, const Comparator* user_key_comparator,
   return new DBIter(db, user_key_comparator, internal_iter, sequence, seed);
 }
 
+Iterator* NewColumnFamilyIterator_db_iter(Iterator* iter,ColumnFamilyHandler& cfh){
+  return new ColumnFamilyIterator(iter,cfh);
+}
+
+Iterator* NewIndexIterator_db_iter(Iterator* iter){
+  return new IndexIterator(iter);
+}
 }  // namespace leveldb

@@ -39,7 +39,6 @@
 namespace leveldb {
 
 const int kNumNonTableCacheFiles = 10;
-
 // Information kept for every waiting writer
 struct DBImpl::Writer {
   explicit Writer(port::Mutex* mu)
@@ -1069,6 +1068,60 @@ static void CleanupIteratorState(void* arg1, void* arg2) {
 }
 
 }  // anonymous namespace
+//***************************************change**********************//
+Status DBImpl::Get(const ReadOptions& options, ColumnFamilyHandler& cfh,const Slice& key,std::string* value){
+  char* data= const_cast<char*>(key.data());
+  std::string col_key=cfh.GetPerix()+std::string(data);
+
+  Slice col_and_key(col_key.c_str(),key.size()+cfh.GetPerixSize());
+  return Get(options,col_and_key,value);
+}
+
+Status DBImpl::Put(const WriteOptions& options, const Slice& key, ColumnFamilyHandler& cfh, const Slice& value) {
+  char *data=const_cast<char*>(key.data());
+  std::string col_key=cfh.GetPerix()+std::string (data);
+
+  Slice col_and_key(col_key.c_str(),key.size()+cfh.GetPerixSize());
+  return Put(options,col_and_key,value);
+}
+
+Status DBImpl::CreateColumnFamily(const std::string col, ColumnFamilyHandler& cfh) {
+  cfh.cf_name_=col;
+  Status statue=Status();
+
+  return statue;
+}
+Iterator* DBImpl::NewColumnFamilyIterator(const ReadOptions& options, ColumnFamilyHandler& cfh) {
+
+  return NewColumnFamilyIterator_db_iter(NewIterator(options),cfh);
+}
+//cun fang suo yin shuju
+Status DBImpl::PutWithIndex(const WriteOptions& options, const Slice& key, const Slice& value) {
+  ColumnFamilyHandler cfh_record=ColumnFamilyHandler("Record");
+  ColumnFamilyHandler cfh_index=ColumnFamilyHandler("Index");
+
+  char prefix_key_encode[9]="00000000";
+  char prefix_value_encode[20]="00000000";
+  for(int i=0;i<key.size();i++){
+    prefix_key_encode[7-i]=key[key.size()-1-i];
+  }
+  for(int i=0;i<value.size();i++){
+    prefix_value_encode[7-i]=value[value.size()-1-i];
+  }
+  Put(WriteOptions(),prefix_key_encode,cfh_record,prefix_value_encode);
+  prefix_value_encode[8]='_';
+  strcat(prefix_value_encode,prefix_key_encode);
+  Slice empty_value=Slice("");
+
+  Put(WriteOptions(),prefix_value_encode,cfh_index,empty_value);
+  return Status::OK();
+}
+
+Iterator* DBImpl::NewIndexIterator(const ReadOptions& options){
+  return NewIndexIterator_db_iter(NewIterator(options));
+}
+
+/*修改结束------------------------------------------------------------------------------------------------*/
 
 Iterator* DBImpl::NewInternalIterator(const ReadOptions& options,
                                       SequenceNumber* latest_snapshot,

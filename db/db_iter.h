@@ -20,6 +20,8 @@ class DBImpl;
 Iterator* NewDBIterator(DBImpl* db, const Comparator* user_key_comparator,
                         Iterator* internal_iter, SequenceNumber sequence,
                         uint32_t seed);
+Iterator* NewColumnFamilyIterator_db_iter(Iterator* iter,ColumnFamilyHandler& cfh);
+Iterator* NewIndexIterator_db_iter(Iterator* iter);
 
 }  // namespace leveldb
 

@@ -6,6 +6,7 @@
 #define STORAGE_LEVELDB_INCLUDE_OPTIONS_H_
 
 #include <stddef.h>
+#include <string>
 
 #include "leveldb/export.h"
 
@@ -181,6 +182,20 @@ struct LEVELDB_EXPORT WriteOptions {
   // system call followed by "fsync()".
   bool sync = false;
 };
+//*******************************************修改处*********************************************//
+//Handle of the columnfamile
+struct LEVELDB_EXPORT ColumnFamilyHandler{
+  std::string cf_name_;
+  ColumnFamilyHandler(std::string cf_name):cf_name_(cf_name){}
+  std::string GetPerix() const{
+    return cf_name_+"_";
+  }
+  int GetPerixSize() const{
+    return cf_name_.size()+1;
+  }
+};
+//*******************************************修改处*********************************************//
+
 
 }  // namespace leveldb
 

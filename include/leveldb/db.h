@@ -105,6 +105,26 @@ class LEVELDB_EXPORT DB {
   // use "snapshot" after this call.
   virtual void ReleaseSnapshot(const Snapshot* snapshot) = 0;
 
+  //*****************************************************修改处************************//
+  //Create the columnfamily of the database,create a columnfamily
+  virtual Status CreateColumnFamily(const std::string col,ColumnFamilyHandler& cfh) = 0;
+
+  //Get the new column iterator of an column
+  virtual Iterator* NewColumnFamilyIterator(const ReadOptions& options,ColumnFamilyHandler& cfh) = 0;
+
+  //Put Function with ColumnFamily
+  virtual Status Put(const WriteOptions& options, const Slice& key,ColumnFamilyHandler& cfh,
+                     const Slice& value) = 0;
+  //Get Function with ColumnFamily
+  virtual Status Get(const ReadOptions& options, ColumnFamilyHandler& cfh,const Slice& key,
+                     std::string* value) = 0;
+  //Put Function with Index
+  virtual Status PutWithIndex(const WriteOptions& options, const Slice& key, const Slice& value) = 0;
+  //Get the Index Interator
+  virtual Iterator* NewIndexIterator(const ReadOptions& options) = 0;
+
+  //**************************************************修改结束**************************//
+
   // DB implementations can export properties about their state
   // via this method.  If "property" is a valid property understood by this
   // DB implementation, fills "*value" with its current value and returns

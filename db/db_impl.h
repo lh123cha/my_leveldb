@@ -43,6 +43,25 @@ class DBImpl : public DB {
   Status Get(const ReadOptions& options, const Slice& key,
              std::string* value) override;
   Iterator* NewIterator(const ReadOptions&) override;
+  /*修改处-----------------------------------------------------------*/
+  //创建columnfamily
+  Status CreateColumnFamily(const std::string col,ColumnFamilyHandler& cfh) override;
+  //带有ColumnFamily的Get
+  Status Get(const ReadOptions& options, ColumnFamilyHandler& cfh,const Slice& key,
+             std::string* value) override;
+  //带有ColumnFamily的Put
+  Status Put(const WriteOptions& options, const Slice& key,ColumnFamilyHandler& cfh,
+             const Slice& value) override;
+  //获得某一Column的迭代器
+  Iterator* NewColumnFamilyIterator(const ReadOptions& options,ColumnFamilyHandler& cfh) override;
+
+  //插入一条带有索引的数据
+  Status PutWithIndex(const WriteOptions& options, const Slice& key, const Slice& value) override;
+
+//  //获得索引的迭代器
+  Iterator* NewIndexIterator(const ReadOptions& options) override;
+
+  /*添加函数结束------------------------------------------------------------------------------------------*/
   const Snapshot* GetSnapshot() override;
   void ReleaseSnapshot(const Snapshot* snapshot) override;
   bool GetProperty(const Slice& property, std::string* value) override;
