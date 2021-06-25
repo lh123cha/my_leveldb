@@ -141,6 +141,9 @@ struct LEVELDB_EXPORT Options {
   // Many applications will benefit from passing the result of
   // NewBloomFilterPolicy() here.
   const FilterPolicy* filter_policy = nullptr;
+
+  //judge whether use hashtable to read data
+  bool use_hash_table= false;
 };
 
 // Options that control read operations
@@ -160,6 +163,9 @@ struct LEVELDB_EXPORT ReadOptions {
   // not have been released).  If "snapshot" is null, use an implicit
   // snapshot of the state at the beginning of this read operation.
   const Snapshot* snapshot = nullptr;
+
+  //judge whether use hashtable to read data
+//  bool use_hash_table= false;
 };
 
 // Options that control write operations
@@ -181,6 +187,7 @@ struct LEVELDB_EXPORT WriteOptions {
   // with sync==true has similar crash semantics to a "write()"
   // system call followed by "fsync()".
   bool sync = false;
+
 };
 //*******************************************修改处*********************************************//
 //Handle of the columnfamile

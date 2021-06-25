@@ -42,13 +42,15 @@ const int kNumNonTableCacheFiles = 10;
 // Information kept for every waiting writer
 struct DBImpl::Writer {
   explicit Writer(port::Mutex* mu)
-      : batch(nullptr), sync(false), done(false), cv(mu) {}
+      : batch(nullptr), sync(false), done(false), cv(mu){}
 
   Status status;
   WriteBatch* batch;
   bool sync;
   bool done;
   port::CondVar cv;
+  //change
+  //bool use_hashtable;
 };
 
 struct DBImpl::CompactionState {
@@ -127,6 +129,7 @@ DBImpl::DBImpl(const Options& raw_options, const std::string& dbname)
     : env_(raw_options.env),
       internal_comparator_(raw_options.comparator),
       internal_filter_policy_(raw_options.filter_policy),
+      use_hash_table(raw_options.use_hash_table),//judge whether use hash table to write and read data
       options_(SanitizeOptions(dbname, &internal_comparator_,
                                &internal_filter_policy_, raw_options)),
       owns_info_log_(options_.info_log != raw_options.info_log),
@@ -433,7 +436,7 @@ Status DBImpl::RecoverLogFile(uint64_t log_number, bool last_log,
     WriteBatchInternal::SetContents(&batch, record);
 
     if (mem == nullptr) {
-      mem = new MemTable(internal_comparator_);
+      mem = new MemTable(internal_comparator_,use_hash_table);
       mem->Ref();
     }
     status = WriteBatchInternal::InsertInto(&batch, mem);
@@ -479,7 +482,7 @@ Status DBImpl::RecoverLogFile(uint64_t log_number, bool last_log,
         mem = nullptr;
       } else {
         // mem can be nullptr if lognum exists but was empty.
-        mem_ = new MemTable(internal_comparator_);
+        mem_ = new MemTable(internal_comparator_,use_hash_table);
         mem_->Ref();
       }
     }
@@ -1070,19 +1073,12 @@ static void CleanupIteratorState(void* arg1, void* arg2) {
 }  // anonymous namespace
 //***************************************change**********************//
 Status DBImpl::Get(const ReadOptions& options, ColumnFamilyHandler& cfh,const Slice& key,std::string* value){
-  char* data= const_cast<char*>(key.data());
-  std::string col_key=cfh.GetPerix()+std::string(data);
-
-  Slice col_and_key(col_key.c_str(),key.size()+cfh.GetPerixSize());
-  return Get(options,col_and_key,value);
+//  std::cout<<"Get de: "+cfh.GetPerix()+key.ToString()<<std::endl;
+  return Get(options,cfh.GetPerix()+key.ToString(),value);
 }
 
 Status DBImpl::Put(const WriteOptions& options, const Slice& key, ColumnFamilyHandler& cfh, const Slice& value) {
-  char *data=const_cast<char*>(key.data());
-  std::string col_key=cfh.GetPerix()+std::string (data);
-
-  Slice col_and_key(col_key.c_str(),key.size()+cfh.GetPerixSize());
-  return Put(options,col_and_key,value);
+  return Put(options,cfh.GetPerix()+key.ToString(),value);
 }
 
 Status DBImpl::CreateColumnFamily(const std::string col, ColumnFamilyHandler& cfh) {
@@ -1251,6 +1247,8 @@ Status DBImpl::Write(const WriteOptions& options, WriteBatch* updates) {
   w.batch = updates;
   w.sync = options.sync;
   w.done = false;
+  //change
+//  w.use_hashtable=options.use_hashtable;
 
   MutexLock l(&mutex_);
   writers_.push_back(&w);
@@ -1424,7 +1422,7 @@ Status DBImpl::MakeRoomForWrite(bool force) {
       log_ = new log::Writer(lfile);
       imm_ = mem_;
       has_imm_.store(true, std::memory_order_release);
-      mem_ = new MemTable(internal_comparator_);
+      mem_ = new MemTable(internal_comparator_,use_hash_table);
       mem_->Ref();
       force = false;  // Do not force another compaction if have room
       MaybeScheduleCompaction();
@@ -1549,7 +1547,7 @@ Status DB::Open(const Options& options, const std::string& dbname, DB** dbptr) {
       impl->logfile_ = lfile;
       impl->logfile_number_ = new_log_number;
       impl->log_ = new log::Writer(lfile);
-      impl->mem_ = new MemTable(impl->internal_comparator_);
+      impl->mem_ = new MemTable(impl->internal_comparator_,options.use_hash_table);
       impl->mem_->Ref();
     }
   }

@@ -188,6 +188,32 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named db_test10
+
+# Build rule for target.
+db_test10: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 db_test10
+.PHONY : db_test10
+
+# fast build rule for target.
+db_test10/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/db_test10.dir/build.make CMakeFiles/db_test10.dir/build
+.PHONY : db_test10/fast
+
+#=============================================================================
+# Target rules for targets named db_testget
+
+# Build rule for target.
+db_testget: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 db_testget
+.PHONY : db_testget
+
+# fast build rule for target.
+db_testget/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/db_testget.dir/build.make CMakeFiles/db_testget.dir/build
+.PHONY : db_testget/fast
+
+#=============================================================================
 # Target rules for targets named db_bench
 
 # Build rule for target.
@@ -1950,6 +1976,63 @@ test/db_test1.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/db_test1.dir/build.make CMakeFiles/db_test1.dir/test/db_test1.cc.s
 .PHONY : test/db_test1.cc.s
 
+test/db_test10.o: test/db_test10.cc.o
+
+.PHONY : test/db_test10.o
+
+# target to build an object file
+test/db_test10.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/db_test10.dir/build.make CMakeFiles/db_test10.dir/test/db_test10.cc.o
+.PHONY : test/db_test10.cc.o
+
+test/db_test10.i: test/db_test10.cc.i
+
+.PHONY : test/db_test10.i
+
+# target to preprocess a source file
+test/db_test10.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/db_test10.dir/build.make CMakeFiles/db_test10.dir/test/db_test10.cc.i
+.PHONY : test/db_test10.cc.i
+
+test/db_test10.s: test/db_test10.cc.s
+
+.PHONY : test/db_test10.s
+
+# target to generate assembly for a file
+test/db_test10.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/db_test10.dir/build.make CMakeFiles/db_test10.dir/test/db_test10.cc.s
+.PHONY : test/db_test10.cc.s
+
+test/db_testget.o: test/db_testget.cpp.o
+
+.PHONY : test/db_testget.o
+
+# target to build an object file
+test/db_testget.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/db_testget.dir/build.make CMakeFiles/db_testget.dir/test/db_testget.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/test/db_testget.cpp.o
+.PHONY : test/db_testget.cpp.o
+
+test/db_testget.i: test/db_testget.cpp.i
+
+.PHONY : test/db_testget.i
+
+# target to preprocess a source file
+test/db_testget.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/db_testget.dir/build.make CMakeFiles/db_testget.dir/test/db_testget.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/test/db_testget.cpp.i
+.PHONY : test/db_testget.cpp.i
+
+test/db_testget.s: test/db_testget.cpp.s
+
+.PHONY : test/db_testget.s
+
+# target to generate assembly for a file
+test/db_testget.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/db_testget.dir/build.make CMakeFiles/db_testget.dir/test/db_testget.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/test/db_testget.cpp.s
+.PHONY : test/db_testget.cpp.s
+
 util/arena.o: util/arena.cc.o
 
 .PHONY : util/arena.o
@@ -2766,6 +2849,8 @@ help:
 	@echo "... db_bench"
 	@echo "... db_test"
 	@echo "... db_test1"
+	@echo "... db_test10"
+	@echo "... db_testget"
 	@echo "... dbformat_test"
 	@echo "... env_posix_test"
 	@echo "... env_test"
@@ -2934,6 +3019,12 @@ help:
 	@echo "... test/db_test1.o"
 	@echo "... test/db_test1.i"
 	@echo "... test/db_test1.s"
+	@echo "... test/db_test10.o"
+	@echo "... test/db_test10.i"
+	@echo "... test/db_test10.s"
+	@echo "... test/db_testget.o"
+	@echo "... test/db_testget.i"
+	@echo "... test/db_testget.s"
 	@echo "... util/arena.o"
 	@echo "... util/arena.i"
 	@echo "... util/arena.s"

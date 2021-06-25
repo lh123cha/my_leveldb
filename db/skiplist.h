@@ -30,6 +30,9 @@
 #include <atomic>
 #include <cassert>
 #include <cstdlib>
+#include <iostream>
+#include <string>
+#include <unordered_map>
 
 #include "util/arena.h"
 #include "util/random.h"
@@ -42,12 +45,16 @@ template <typename Key, class Comparator>
 class SkipList {
  private:
   struct Node;
-
  public:
+  //hashmap
+  std::unordered_map<const char*,Node*> map;
+  //whether use hashmap
+  bool use_hashmap;
+
   // Create a new SkipList object that will use "cmp" for comparing keys,
   // and will allocate memory using "*arena".  Objects allocated in the arena
   // must remain allocated for the lifetime of the skiplist object.
-  explicit SkipList(Comparator cmp, Arena* arena);
+  explicit SkipList(Comparator cmp, Arena* arena,bool use_hashmap);
 
   SkipList(const SkipList&) = delete;
   SkipList& operator=(const SkipList&) = delete;
@@ -139,6 +146,7 @@ class SkipList {
 
   // Read/written only by Insert().
   Random rnd_;
+
 };
 
 // Implementation details follow
@@ -222,6 +230,26 @@ inline void SkipList<Key, Comparator>::Iterator::Prev() {
 
 template <typename Key, class Comparator>
 inline void SkipList<Key, Comparator>::Iterator::Seek(const Key& target) {
+  if(list_->use_hashmap){//使用hashmap查找
+    uint32_t length;
+    //encode the key to delete the sequence and the valtype to get the user_key
+    const char *users_key=GetVarint32Ptr((char *)target,(char *)target+5,&length);
+    std::string user_key(users_key,length-8);
+    //find the latest version of the target
+    Node* iter= nullptr;
+    auto got=list_->map.find(user_key.c_str());
+    //find()返回迭代器,定位到当前user_key的最新版本
+    if(got !=list_->map.end()){
+      iter=got->second;
+      //来往后遍历SkipList找到第⼀个版本号,⼩于等于查询本号的Node
+      while(list_->compare_(iter->key,target)<0){
+        iter->Next(0);
+      }
+    }
+    node_=iter;
+    if(node_!= nullptr)return;
+  }
+
   node_ = list_->FindGreaterOrEqual(target, nullptr);
 }
 
@@ -322,11 +350,12 @@ typename SkipList<Key, Comparator>::Node* SkipList<Key, Comparator>::FindLast()
 }
 
 template <typename Key, class Comparator>
-SkipList<Key, Comparator>::SkipList(Comparator cmp, Arena* arena)
+SkipList<Key, Comparator>::SkipList(Comparator cmp, Arena* arena,bool use_hashmap)
     : compare_(cmp),
       arena_(arena),
       head_(NewNode(0 /* any key will do */, kMaxHeight)),
       max_height_(1),
+      use_hashmap(use_hashmap),//judge whether use hashmap
       rnd_(0xdeadbeef) {
   for (int i = 0; i < kMaxHeight; i++) {
     head_->SetNext(i, nullptr);
@@ -365,6 +394,14 @@ void SkipList<Key, Comparator>::Insert(const Key& key) {
     // we publish a pointer to "x" in prev[i].
     x->NoBarrier_SetNext(i, prev[i]->NoBarrier_Next(i));//set next of x
     prev[i]->SetNext(i, x);//set pre of x
+  }
+  if(use_hashmap) {
+    uint32_t length;
+    //encode the key to delete the sequence and the valtype to get the user_key
+    const char *users_key=GetVarint32Ptr((char *)key,(char *)key+5,&length);
+    std::string map_key(users_key,length-8);
+    map[map_key.c_str()]=x;
+    //std::cout<<"has insert hash map:"<<map[map_key.c_str()]->key<<std::endl;
   }
 }
 

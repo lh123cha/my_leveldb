@@ -21,7 +21,7 @@ class MemTable {
  public:
   // MemTables are reference counted.  The initial reference count
   // is zero and the caller must call Ref() at least once.
-  explicit MemTable(const InternalKeyComparator& comparator);
+  explicit MemTable(const InternalKeyComparator& comparator,bool use_hashmap);
 
   MemTable(const MemTable&) = delete;
   MemTable& operator=(const MemTable&) = delete;
@@ -80,6 +80,7 @@ class MemTable {
   int refs_;
   Arena arena_;
   Table table_;
+  bool use_hashmap;
 };
 
 }  // namespace leveldb

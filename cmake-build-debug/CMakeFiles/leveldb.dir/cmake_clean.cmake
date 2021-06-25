@@ -24,6 +24,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/leveldb.dir/table/table.cc.o"
   "CMakeFiles/leveldb.dir/table/table_builder.cc.o"
   "CMakeFiles/leveldb.dir/table/two_level_iterator.cc.o"
+  "CMakeFiles/leveldb.dir/test/db_testget.cpp.o"
   "CMakeFiles/leveldb.dir/util/arena.cc.o"
   "CMakeFiles/leveldb.dir/util/bloom.cc.o"
   "CMakeFiles/leveldb.dir/util/cache.cc.o"

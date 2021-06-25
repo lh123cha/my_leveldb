@@ -1,6 +1,8 @@
 /home/lh123/Downloads/finalproject/courseforleveldb-master/leveldb/cmake-build-debug/CMakeFiles/install/local.dir
 /home/lh123/Downloads/finalproject/courseforleveldb-master/leveldb/cmake-build-debug/CMakeFiles/install.dir
 /home/lh123/Downloads/finalproject/courseforleveldb-master/leveldb/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/lh123/Downloads/finalproject/courseforleveldb-master/leveldb/cmake-build-debug/CMakeFiles/db_test10.dir
+/home/lh123/Downloads/finalproject/courseforleveldb-master/leveldb/cmake-build-debug/CMakeFiles/db_testget.dir
 /home/lh123/Downloads/finalproject/courseforleveldb-master/leveldb/cmake-build-debug/CMakeFiles/db_bench.dir
 /home/lh123/Downloads/finalproject/courseforleveldb-master/leveldb/cmake-build-debug/CMakeFiles/env_posix_test.dir
 /home/lh123/Downloads/finalproject/courseforleveldb-master/leveldb/cmake-build-debug/CMakeFiles/logging_test.dir

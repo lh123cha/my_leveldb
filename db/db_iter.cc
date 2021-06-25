@@ -7,8 +7,11 @@
 #include "db/db_impl.h"
 #include "db/dbformat.h"
 #include "db/filename.h"
+#include <iostream>
+
 #include "leveldb/env.h"
 #include "leveldb/iterator.h"
+
 #include "port/port.h"
 #include "util/logging.h"
 #include "util/mutexlock.h"
@@ -93,7 +96,17 @@ class IndexIterator :public Iterator{
 
   bool Valid() const override {return valid_;}
   Slice key() const override {
-    return  Slice(iter_->key().data(),iter_->key().size());
+    std::string keys=iter_->key().ToString();
+    std::string sub_key=keys.substr(6,8);
+    int len=0;
+    for(int i=0;i<sub_key.length();i++){
+      if(sub_key[i]!='0'){
+        len=i;
+        break;
+      }
+    }
+    std::string res_key=sub_key.substr(len,sub_key.length()-1);
+    return  Slice(iter_->key().data()+6+len,sub_key.length()-len);
   }
   Slice value() const override {
     return iter_->value();

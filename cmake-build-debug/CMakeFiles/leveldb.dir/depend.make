@@ -503,6 +503,14 @@ CMakeFiles/leveldb.dir/table/two_level_iterator.cc.o: ../table/iterator_wrapper.
 CMakeFiles/leveldb.dir/table/two_level_iterator.cc.o: ../table/two_level_iterator.h
 CMakeFiles/leveldb.dir/table/two_level_iterator.cc.o: ../table/two_level_iterator.cc
 
+CMakeFiles/leveldb.dir/test/db_testget.cpp.o: ../include/leveldb/db.h
+CMakeFiles/leveldb.dir/test/db_testget.cpp.o: ../include/leveldb/export.h
+CMakeFiles/leveldb.dir/test/db_testget.cpp.o: ../include/leveldb/iterator.h
+CMakeFiles/leveldb.dir/test/db_testget.cpp.o: ../include/leveldb/options.h
+CMakeFiles/leveldb.dir/test/db_testget.cpp.o: ../include/leveldb/slice.h
+CMakeFiles/leveldb.dir/test/db_testget.cpp.o: ../include/leveldb/status.h
+CMakeFiles/leveldb.dir/test/db_testget.cpp.o: ../test/db_testget.cpp
+
 CMakeFiles/leveldb.dir/util/arena.cc.o: ../util/arena.h
 CMakeFiles/leveldb.dir/util/arena.cc.o: ../util/arena.cc
 

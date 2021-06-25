@@ -119,7 +119,7 @@ endif(BUILD_SHARED_LIBS)
 # Must be included before CMAKE_INSTALL_INCLUDEDIR is used.
 include(GNUInstallDirs)
 
-add_library(leveldb "")
+add_library(leveldb "" test/db_testget.cpp)
 target_sources(leveldb
   PRIVATE
     "${PROJECT_BINARY_DIR}/${LEVELDB_PORT_CONFIG_DIR}/port_config.h"
@@ -496,3 +496,15 @@ add_executable(db_test1
   "${PROJECT_SOURCE_DIR}/test/db_test1.cc"
         )
 target_link_libraries(db_test1 leveldb)
+
+add_executable(db_test10
+        "${PROJECT_SOURCE_DIR}/test/db_test10.cc"
+        )
+target_link_libraries(db_test10 leveldb gtest)
+
+add_executable(db_testget
+        "${PROJECT_SOURCE_DIR}/test/db_testget.cpp"
+        )
+target_link_libraries(db_testget leveldb)
+
+
